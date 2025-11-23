@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+import certifi
 
 # Load environment variables
 load_dotenv()
@@ -15,14 +16,15 @@ def get_mongo_client():
     """Get MongoDB client connection with proper SSL configuration"""
     MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
     
-    # Configure client with SSL settings for production compatibility
+    # Configure client with SSL settings using certifi
     client = MongoClient(
         MONGO_URI,
-        tls=True,
-        tlsAllowInvalidCertificates=True,
-        serverSelectionTimeoutMS=5000,
-        connectTimeoutMS=10000,
-        socketTimeoutMS=10000
+        tlsCAFile=certifi.where(),
+        serverSelectionTimeoutMS=30000,
+        connectTimeoutMS=30000,
+        socketTimeoutMS=30000,
+        retryWrites=True,
+        w='majority'
     )
     return client
 
