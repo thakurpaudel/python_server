@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -11,13 +12,19 @@ tasks = [
     {"id": 2, "title": "Build an API", "completed": True}
 ]
 
-# Root endpoint
+# Root endpoint - serve the HTML interface
 @app.route('/')
 def home():
+    return send_from_directory('.', 'index.html')
+
+# API documentation endpoint
+@app.route('/api')
+def api_docs():
     return jsonify({
         "message": "Welcome to the Simple API",
         "endpoints": {
-            "GET /": "This help message",
+            "GET /": "Web interface",
+            "GET /api": "This help message",
             "GET /api/tasks": "Get all tasks",
             "GET /api/tasks/<id>": "Get a specific task",
             "POST /api/tasks": "Create a new task",

@@ -268,10 +268,15 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5001';
+        // Auto-detect API base URL (works both locally and on Render)
+        const API_BASE = window.location.origin;
+
         const output = document.getElementById('output');
         const taskList = document.getElementById('taskList');
         const statusIndicator = document.getElementById('statusIndicator');
+
+        // Display the detected API URL
+        document.getElementById('apiUrl').textContent = API_BASE;
 
         function displayOutput(data) {
             output.textContent = JSON.stringify(data, null, 2);
