@@ -12,9 +12,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_mongo_client():
-    """Get MongoDB client connection"""
+    """Get MongoDB client connection with proper SSL configuration"""
     MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
-    return MongoClient(MONGO_URI)
+    
+    # Configure client with SSL settings for production compatibility
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsAllowInvalidCertificates=True,
+        serverSelectionTimeoutMS=5000,
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000
+    )
+    return client
 
 def clear_collections(db):
     """Clear all data from collections"""

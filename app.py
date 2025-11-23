@@ -13,17 +13,32 @@ CORS(app)
 
 # MongoDB connection
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
-print(f"🔗 Connecting to MongoDB at {MONGO_URI}")
-client = MongoClient(MONGO_URI)
-db = client['flask_db']
-tasks_collection = db['tasks']
-users_collection = db['users']
+
+# Configure MongoDB client with SSL settings for Render compatibility
+try:
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsAllowInvalidCertificates=True,  # For compatibility with Render
+        serverSelectionTimeoutMS=5000,
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000
+    )
+except Exception as e:
+    print(f"⚠️ MongoDB connection error: {e}")
+    client = None
+db = client['flask_db'] if client is not None else None
+tasks_collection = db['tasks'] if db is not None else None
+users_collection = db['users'] if db is not None else None
 
 # Initialize database with sample data if empty (runs once on startup)
-try:
-    init_database_if_empty(db)
-except Exception as e:
-    print(f"⚠️  Could not initialize database: {e}")
+if client is not None and db is not None:
+    try:
+        init_database_if_empty(db)
+    except Exception as e:
+        print(f"⚠️  Could not initialize database: {e}")
+else:
+    print("⚠️ MongoDB client not initialized")
 
 # Helper function to convert ObjectId to string
 def serialize_task(task):
