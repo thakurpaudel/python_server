@@ -6,6 +6,8 @@ from bson import ObjectId
 import os
 import certifi
 import ssl
+from pymongo.server_api import ServerApi
+
 
 # Import database setup functions
 from setup_database import init_database_if_empty, get_mongo_client
@@ -20,25 +22,25 @@ MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
 try:
     print(f"🔗 Attempting MongoDB connection...")
     
-    # Parse the URI to check if it's using mongodb+srv
-    is_srv = MONGO_URI.startswith('mongodb+srv://')
+    # # Parse the URI to check if it's using mongodb+srv
+    # is_srv = MONGO_URI.startswith('mongodb+srv://')
     
-    if is_srv:
-        # For mongodb+srv:// connections - minimal config
-        client = MongoClient(
-            MONGO_URI,
-            tlsCAFile=certifi.where(),
-            serverSelectionTimeoutMS=30000
-        )
-    else:
-        # For standard mongodb:// connections
-        client = MongoClient(
-            MONGO_URI,
-            tls=True,
-            tlsCAFile=certifi.where(),
-            serverSelectionTimeoutMS=30000
-        )
-    
+    # if is_srv:
+    #     # For mongodb+srv:// connections - minimal config
+    #     client = MongoClient(
+    #         MONGO_URI,
+    #         tlsCAFile=certifi.where(),
+    #         serverSelectionTimeoutMS=30000
+    #     )
+    # else:
+    #     # For standard mongodb:// connections
+    #     client = MongoClient(
+    #         MONGO_URI,
+    #         tls=True,
+    #         tlsCAFile=certifi.where(),
+    #         serverSelectionTimeoutMS=30000
+    #     )
+    client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
     # Test the connection
     client.admin.command('ping')
     print("✅ MongoDB connected successfully!")
